@@ -24,6 +24,18 @@ class RenderComponent {
   }
 }
 
+function hexToRgba(hex: string, alpha: number): string {
+  if (hex.startsWith('#')) hex = hex.slice(1);
+  if (hex.length === 3) {
+    hex = hex.split('').map(ch => ch + ch).join('');
+  }
+  const bigint = parseInt(hex, 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
 class SelectableComponent {
   selected: boolean;
   constructor() { this.selected = false; }
@@ -217,11 +229,13 @@ class RenderSystem {
       }
 
       // Box body
-      ctx.fillStyle = render.color + (sel?.selected ? '33' : '18');
+      const bodyAlpha = sel?.selected ? 0.3 : 0.18;
+      ctx.fillStyle = hexToRgba(render.color, bodyAlpha);
       ctx.fillRect(bx, by, size.w, size.h);
 
       // Border
-      ctx.strokeStyle = sel?.selected ? render.color : render.color + '88';
+      const borderAlpha = sel?.selected ? 1 : 0.6;
+      ctx.strokeStyle = hexToRgba(render.color, borderAlpha);
       ctx.lineWidth = sel?.selected ? 2 : 1.5;
       ctx.strokeRect(bx, by, size.w, size.h);
 
